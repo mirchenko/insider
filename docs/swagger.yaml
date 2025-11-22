@@ -1,0 +1,84 @@
+definitions:
+  model.Message:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      id:
+        type: integer
+      phone_number:
+        type: string
+      reason:
+        type: string
+      status:
+        type: string
+      updated_at:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /health:
+    get:
+      description: Returns the health status of the application
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health Check
+      tags:
+      - Health
+  /messages:
+    get:
+      consumes:
+      - application/json
+      description: list messages by limit, offset and status
+      parameters:
+      - default: 24
+        description: Limit int
+        in: query
+        maximum: 1000
+        minimum: 1
+        name: limit
+        type: integer
+      - default: 0
+        description: Offset int
+        in: query
+        maximum: 1000
+        minimum: 0
+        name: offset
+        type: integer
+      - collectionFormat: csv
+        default: sent
+        description: Status enum(sent, delivered, pending, failed)
+        in: query
+        items:
+          enum:
+          - sent
+          - delivered
+          - pending
+          - failed
+          type: string
+        name: status
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Message'
+            type: array
+      summary: list messages
+      tags:
+      - Messages
+swagger: "2.0"

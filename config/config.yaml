@@ -1,0 +1,13 @@
+port: 8080
+sender:
+  # TODO: change to 120
+  cycle_duration_seconds: 10
+database:
+  url: "postgresql://user:password@localhost:5432/insider?sslmode=disable"
+providers:
+  webhook:
+    base_url: https://webhook.site
+    tenant_id: 576e9a43-b15f-4ffb-94da-ccc20f6faf62
+    retries_count: 3
+    retry_timeout_seconds: 1
+    auth_key: example-auth-key
