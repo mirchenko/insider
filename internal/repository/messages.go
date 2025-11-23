@@ -9,16 +9,22 @@ import (
 	"gorm.io/gorm"
 )
 
-type MessagesRepository struct {
+type MessageRepository interface {
+	Fetch(ctx context.Context, r *model.ListMessagesRequest) ([]model.Message, error)
+	Count(ctx context.Context, r *model.ListMessagesRequest) (*int64, error)
+	Update(ctx context.Context, msg *model.Message) (*model.Message, error)
+}
+
+type MessagesRepositoryIml struct {
 	db  *gorm.DB
 	log *logger.Logger
 }
 
-func NewMessagesRepository(db *gorm.DB, log *logger.Logger) *MessagesRepository {
-	return &MessagesRepository{db: db, log: log}
+func NewMessagesRepository(db *gorm.DB, log *logger.Logger) *MessagesRepositoryIml {
+	return &MessagesRepositoryIml{db: db, log: log}
 }
 
-func (m *MessagesRepository) Fetch(ctx context.Context, r *model.ListMessagesRequest) ([]model.Message, error) {
+func (m *MessagesRepositoryIml) Fetch(ctx context.Context, r *model.ListMessagesRequest) ([]model.Message, error) {
 	messages, err := buildListQuery(m.db, r).Limit(r.Limit).Offset(r.Offset).Order("created_at desc").Find(ctx)
 
 	if err != nil {
@@ -28,7 +34,7 @@ func (m *MessagesRepository) Fetch(ctx context.Context, r *model.ListMessagesReq
 	return messages, nil
 }
 
-func (m *MessagesRepository) Count(ctx context.Context, r *model.ListMessagesRequest) (*int64, error) {
+func (m *MessagesRepositoryIml) Count(ctx context.Context, r *model.ListMessagesRequest) (*int64, error) {
 	count, err := buildListQuery(m.db, r).Count(ctx, "id")
 
 	if err != nil {
@@ -38,7 +44,7 @@ func (m *MessagesRepository) Count(ctx context.Context, r *model.ListMessagesReq
 	return &count, nil
 }
 
-func (m *MessagesRepository) Update(ctx context.Context, msg *model.Message) (*model.Message, error) {
+func (m *MessagesRepositoryIml) Update(ctx context.Context, msg *model.Message) (*model.Message, error) {
 	_, err := gorm.G[model.Message](m.db).Where("id = ?", msg.ID).Updates(ctx, *msg)
 	if err != nil {
 		m.log.Error().Err(err).Dict("message", zerolog.Dict().Int64("id", msg.ID)).Msg("failed to update message")
@@ -50,7 +56,7 @@ func (m *MessagesRepository) Update(ctx context.Context, msg *model.Message) (*m
 
 func buildListQuery(db *gorm.DB, r *model.ListMessagesRequest) gorm.ChainInterface[model.Message] {
 	query := gorm.G[model.Message](db).Where("1 = 1")
-	if r.Status != nil {
+	if len(r.Status) != 0 {
 		query = query.Where("status in ?", r.Status)
 	}
 	return query

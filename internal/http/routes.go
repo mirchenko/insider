@@ -2,7 +2,6 @@ package http
 
 import (
 	"insider/docs"
-	"insider/internal/handler"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
@@ -10,12 +9,14 @@ import (
 )
 
 type Routers struct {
-	messagesHandler *handler.MessagesHandler
-	senderHandler   *handler.SenderHandler
+	healthHandler   *HealthHandler
+	messagesHandler *MessagesHandler
+	senderHandler   *SenderHandler
 }
 
-func NewRouters(mh *handler.MessagesHandler, sh *handler.SenderHandler) *Routers {
+func NewRouters(hh *HealthHandler, mh *MessagesHandler, sh *SenderHandler) *Routers {
 	return &Routers{
+		healthHandler:   hh,
 		messagesHandler: mh,
 		senderHandler:   sh,
 	}
@@ -28,7 +29,7 @@ func (r *Routers) Register(router *gin.Engine) {
 	api := router.Group("/api/v1")
 
 	health := api.Group("/health")
-	health.GET("", handler.Health)
+	health.GET("", r.healthHandler.Health)
 
 	messages := api.Group("/messages")
 	messages.GET("", r.messagesHandler.ListMessages)

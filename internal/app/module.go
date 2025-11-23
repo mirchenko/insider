@@ -4,7 +4,6 @@ import (
 	"insider/config"
 	"insider/internal/cache"
 	"insider/internal/database"
-	"insider/internal/handler"
 	"insider/internal/http"
 	"insider/internal/provider"
 	"insider/internal/repository"
@@ -22,7 +21,6 @@ var Module = fx.Options(
 	cache.Module,
 	repository.Module,
 	services.Module,
-	handler.Module,
 	http.Module,
 	provider.Module,
 	sender.Module,

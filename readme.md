@@ -1,8 +1,3 @@
-## Lint
-Standard recommended default linters
-```shell
-golangci-lint run
-```
 
 ## Migrations
 ### Create
@@ -24,3 +19,15 @@ migrate -path $(pwd)/internal/database/migrations -database 'postgresql://user:p
 ```shell
 swag init -g cmd/api/main.go
 ```
+
+## Test units
+```shell
+go test -v ./...;
+```
+
+## Lint
+Standard recommended default linters
+```shell
+golangci-lint run
+```
+

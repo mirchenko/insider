@@ -14,7 +14,6 @@ var messageStatuses = map[string]struct{}{
 	model.MessageStatusFailed:    {},
 }
 
-// TODO: make better
 func validateMessageStatus(fl validator.FieldLevel) bool {
 	statuses := fl.Field()
 	if statuses.Kind() != reflect.Slice {

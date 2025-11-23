@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"insider/config"
-	"insider/internal/http/validators"
 	"insider/pkg/logger"
 	"net/http"
 
@@ -11,12 +10,8 @@ import (
 	"go.uber.org/fx"
 )
 
-func NewServer(routes *Routers, log *logger.Logger, shutdowner fx.Shutdowner) *gin.Engine {
+func NewServer(routes *Routers) *gin.Engine {
 	r := gin.Default()
-	if err := validators.RegisterValidators(); err != nil {
-		log.Error().Err(err).Msg("failed to register gin http custom validators")
-		_ = shutdowner.Shutdown()
-	}
 	routes.Register(r)
 	return r
 }

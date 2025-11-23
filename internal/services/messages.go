@@ -8,16 +8,24 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type MessagesService struct {
-	repo *repository.MessagesRepository
+type MessagesService interface {
+	List(ctx context.Context, r *model.ListMessagesRequest) (*model.ListMessagesResponse, error)
 }
 
-func NewMessagesService(repo *repository.MessagesRepository) *MessagesService {
-	return &MessagesService{repo: repo}
+type MessagesServiceImpl struct {
+	repo repository.MessageRepository
 }
 
-func (s *MessagesService) List(ctx context.Context, r *model.ListMessagesRequest) (*model.ListMessagesResponse, error) {
-	if r.Status == nil {
+func NewMessagesService(repo repository.MessageRepository) *MessagesServiceImpl {
+	return &MessagesServiceImpl{repo: repo}
+}
+
+func (s *MessagesServiceImpl) List(ctx context.Context, r *model.ListMessagesRequest) (*model.ListMessagesResponse, error) {
+	if r.Limit == 0 || r.Limit > 1000 {
+		r.Limit = 24
+	}
+
+	if len(r.Status) == 0 {
 		r.Status = []string{model.MessageStatusSent}
 	}
 

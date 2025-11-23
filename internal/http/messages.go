@@ -1,17 +1,25 @@
-package handler
+package http
 
 import (
+	"insider/internal/http/validators"
 	"insider/internal/model"
 	"insider/internal/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/zerolog/log"
+	"go.uber.org/fx"
 )
 
 type MessagesHandler struct {
-	svc *services.MessagesService
+	svc services.MessagesService
 }
 
-func NewMessagesHandler(svc *services.MessagesService) *MessagesHandler {
+func NewMessagesHandler(svc services.MessagesService, shutdowner fx.Shutdowner) *MessagesHandler {
+	if err := validators.RegisterValidators(); err != nil {
+		log.Error().Err(err).Msg("failed to register gin http custom validators")
+		_ = shutdowner.Shutdown()
+	}
+
 	return &MessagesHandler{svc: svc}
 }
 
@@ -34,7 +42,7 @@ func (h *MessagesHandler) ListMessages(c *gin.Context) {
 		return
 	}
 
-	data, err := h.svc.List(c.Request.Context(), model.NewListMessagesHTTPRequest(c))
+	res, err := h.svc.List(c.Request.Context(), &req)
 
 	if err != nil {
 		c.JSON(500, gin.H{
@@ -44,6 +52,7 @@ func (h *MessagesHandler) ListMessages(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"data": data,
+		"data":     res.Data,
+		"metadata": res.ListResponseMetadata,
 	})
 }

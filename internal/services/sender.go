@@ -10,24 +10,28 @@ const (
 	SenderStatusError   = "error"
 )
 
-type SenderService struct {
-	sender *sender.Sender
+type SenderService interface {
+	Toggle() (string, error)
 }
 
-func NewSenderService(sender *sender.Sender) *SenderService {
-	return &SenderService{
+type SenderServiceImpl struct {
+	sender sender.Sender
+}
+
+func NewSenderService(sender sender.Sender) *SenderServiceImpl {
+	return &SenderServiceImpl{
 		sender: sender,
 	}
 }
 
-func (s *SenderService) Toggle() (string, error) {
+func (s *SenderServiceImpl) Toggle() (string, error) {
 	if s.sender.IsStarted() {
 		s.sender.Stop()
 		return SenderStatusStopped, nil
 	}
 
 	if err := s.sender.Start(); err != nil {
-		return "", err
+		return SenderStatusError, err
 	}
 
 	return SenderStatusStarted, nil

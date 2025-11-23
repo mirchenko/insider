@@ -6,7 +6,7 @@ sender:
 database:
   postgres:
     url: "postgresql://user:password@localhost:5432/insider?sslmode=disable"
-    #  debug: true
+#    debug: true
 cache:
   redis:
     url: "redis://localhost:6379/0?protocol=3"

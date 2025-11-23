@@ -1,4 +1,4 @@
-package handler
+package http
 
 import (
 	"insider/internal/services"
@@ -7,14 +7,14 @@ import (
 )
 
 type SenderHandler struct {
-	svc *services.SenderService
+	svc services.SenderService
 }
 
 type ToggleSenderResponse struct {
 	Status string `json:"status"`
 }
 
-func NewSenderHandler(svc *services.SenderService) *SenderHandler {
+func NewSenderHandler(svc services.SenderService) *SenderHandler {
 	return &SenderHandler{svc: svc}
 }
 
