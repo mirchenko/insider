@@ -4,16 +4,14 @@ sender:
   iter_buffer_size: 2
 database:
   postgres:
-    url: "postgresql://user:password@localhost:5432/insider?sslmode=disable"
-#    debug: true
+    url: "postgresql://user:password@postgresdb:5432/insider?sslmode=disable"
 cache:
   redis:
-    url: "redis://localhost:6379/0?protocol=3"
+    url: "redis://redis:6379/0?protocol=3"
 providers:
   webhook:
     base_url: https://webhook.site
     tenant_id: f028ef11-5767-4ceb-8ca8-b7eb60c9f142
     retries_count: 3
     retry_timeout_seconds: 1
-    auth_key: example-auth-key
-#    debug: true
+    auth_key: INS.me1x9uMcyYGlhKKQVPoc.bO3j9aZwRTOcA2Ywo
