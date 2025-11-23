@@ -30,7 +30,5 @@ func NewDatabase(cfg *config.Config, log *logger.Logger, shutdowner fx.Shutdowne
 		_ = shutdowner.Shutdown()
 		return nil, err
 	}
-
-	// TODO: run migrate
 	return db, nil
 }

@@ -10,12 +10,50 @@ services:
     volumes:
       - insider-postgres-data:/var/lib/postgresql
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 3s
+      timeout: 3s
+      retries: 3
     networks:
       - insider
   redis:
     image: redis
     ports:
       - '6379:6379'
+    networks:
+      - insider
+  migrations:
+    image: migrate/migrate:latest
+    command: [
+      "-path", "/migrations",
+      "-database", "postgresql://user:password@postgresdb:5432/insider?sslmode=disable",
+      "up"
+    ]
+    volumes:
+      - ./internal/database/migrations:/migrations:ro
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    networks:
+      - insider
+    restart: "no"
+  app:
+    image: insider
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    ports:
+      - '8080:8080'
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      migrations:
+        condition: service_completed_successfully
+    networks:
+      - insider
 
 volumes:
   insider-postgres-data:
