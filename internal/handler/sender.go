@@ -10,42 +10,37 @@ type SenderHandler struct {
 	svc *services.SenderService
 }
 
+type ToggleSenderResponse struct {
+	Status string `json:"status"`
+}
+
 func NewSenderHandler(svc *services.SenderService) *SenderHandler {
 	return &SenderHandler{svc: svc}
 }
 
-// StartSender godoc
-// @Summary Starts sender
-// @Description starts sender if it isn't running yet
+// ToggleSender godoc
+// @Summary Starts/Stops sender
+// @Description starts/stop sender based on sender current status, return started, stopped, error statuses in response
 // @Tags Sender
 // @Accept json
 // @Produce json
-// @Success 200 {"ok": true}
-// @Fail 409 {object} gin.H "Conflict error"
-// @Router /messages [get]
-func (h *SenderHandler) StartSender(c *gin.Context) {
-	if err := h.svc.Start(); err != nil {
-		c.JSON(409, gin.H{"error": err.Error()})
+// @Success 200 {object} ToggleSenderResponse
+// @Example 200 {"status":"started"}
+// @Example 200 {"status":"stopped"}
+// @Success 409 {object} ToggleSenderResponse
+// @Example 409 {"status":"error"}
+// @Router /sender/toggle [post]
+func (h *SenderHandler) ToggleSender(c *gin.Context) {
+	status, err := h.svc.Toggle()
+	if err != nil {
+		c.JSON(409, ToggleSenderResponse{
+			status,
+		})
+
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"ok": true,
-	})
-}
-
-// StopSender godoc
-// @Summary stops sender
-// @Description stop sender
-// @Tags Sender
-// @Accept json
-// @Produce json
-// @Success 200 {"ok": true}
-// @Router /messages [get]
-func (h *SenderHandler) StopSender(c *gin.Context) {
-	h.svc.Stop()
-
-	c.JSON(200, gin.H{
-		"ok": true,
+	c.JSON(200, ToggleSenderResponse{
+		status,
 	})
 }

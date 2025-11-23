@@ -11,15 +11,17 @@ import (
 	gormlogger "gorm.io/gorm/logger"
 )
 
-func New(cfg *config.Config, log *logger.Logger, shutdowner fx.Shutdowner) (*gorm.DB, error) {
+func NewDatabase(cfg *config.Config, log *logger.Logger, shutdowner fx.Shutdowner) (*gorm.DB, error) {
 	dbLogger := gormlogger.New(
 		log,
-		gormlogger.Config{
-			LogLevel: gormlogger.Info,
-		},
+		gormlogger.Config{},
 	)
 
-	db, err := gorm.Open(postgres.Open(cfg.URL), &gorm.Config{
+	if cfg.DatabaseConfig.Debug {
+		dbLogger = dbLogger.LogMode(gormlogger.Info)
+	}
+
+	db, err := gorm.Open(postgres.Open(cfg.DatabaseConfig.URL), &gorm.Config{
 		Logger: dbLogger,
 	})
 
@@ -32,5 +34,3 @@ func New(cfg *config.Config, log *logger.Logger, shutdowner fx.Shutdowner) (*gor
 	// TODO: run migrate
 	return db, nil
 }
-
-var Module = fx.Provide(New)

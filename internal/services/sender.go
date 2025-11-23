@@ -4,6 +4,12 @@ import (
 	"insider/internal/sender"
 )
 
+const (
+	SenderStatusStarted = "started"
+	SenderStatusStopped = "stopped"
+	SenderStatusError   = "error"
+)
+
 type SenderService struct {
 	sender *sender.Sender
 }
@@ -14,10 +20,15 @@ func NewSenderService(sender *sender.Sender) *SenderService {
 	}
 }
 
-func (s *SenderService) Start() error {
-	return s.sender.Start()
-}
+func (s *SenderService) Toggle() (string, error) {
+	if s.sender.IsStarted() {
+		s.sender.Stop()
+		return SenderStatusStopped, nil
+	}
 
-func (s *SenderService) Stop() {
-	s.sender.Stop()
+	if err := s.sender.Start(); err != nil {
+		return "", err
+	}
+
+	return SenderStatusStarted, nil
 }

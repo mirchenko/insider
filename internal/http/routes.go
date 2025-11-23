@@ -34,6 +34,5 @@ func (r *Routers) Register(router *gin.Engine) {
 	messages.GET("", r.messagesHandler.ListMessages)
 
 	sender := api.Group("/sender")
-	sender.POST("/start", r.senderHandler.StartSender)
-	sender.POST("/stop", r.senderHandler.StopSender)
+	sender.POST("/toggle", r.senderHandler.ToggleSender)
 }

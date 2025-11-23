@@ -1,13 +1,20 @@
 port: 8080
 sender:
   # TODO: change to 120
-  cycle_duration_seconds: 10
+  iter_duration_seconds: 25
+  iter_buffer_size: 2
 database:
-  url: "postgresql://user:password@localhost:5432/insider?sslmode=disable"
+  postgres:
+    url: "postgresql://user:password@localhost:5432/insider?sslmode=disable"
+    #  debug: true
+cache:
+  redis:
+    url: "redis://localhost:6379/0?protocol=3"
 providers:
   webhook:
     base_url: https://webhook.site
-    tenant_id: 576e9a43-b15f-4ffb-94da-ccc20f6faf62
+    tenant_id: f028ef11-5767-4ceb-8ca8-b7eb60c9f142
     retries_count: 3
     retry_timeout_seconds: 1
     auth_key: example-auth-key
+#    debug: true

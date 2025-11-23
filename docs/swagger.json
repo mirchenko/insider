@@ -89,9 +89,46 @@
                     }
                 }
             }
+        },
+        "/sender/toggle": {
+            "post": {
+                "description": "starts/stop sender based on sender current status, return started, stopped, error statuses in response",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Sender"
+                ],
+                "summary": "Starts/Stops sender",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ToggleSenderResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/handler.ToggleSenderResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "handler.ToggleSenderResponse": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
         "model.Message": {
             "type": "object",
             "properties": {
@@ -102,6 +139,9 @@
                     "type": "string"
                 },
                 "deleted_at": {
+                    "type": "string"
+                },
+                "external_message_id": {
                     "type": "string"
                 },
                 "id": {

@@ -12,9 +12,23 @@ type Config struct {
 	DatabaseConfig
 	WebhookProviderConfig
 	SenderConfig
+	CacheConfig
 }
 type DatabaseConfig struct {
-	URL string
+	PostgresConfig
+}
+
+type PostgresConfig struct {
+	URL   string `yaml:"url"`
+	Debug bool   `yaml:"debug"`
+}
+
+type RedisConfig struct {
+	URL string `yaml:"url"`
+}
+
+type CacheConfig struct {
+	RedisConfig
 }
 
 type WebhookProviderConfig struct {
@@ -23,10 +37,12 @@ type WebhookProviderConfig struct {
 	RetriesCount        int    `yaml:"retries_count"`
 	RetryTimeoutSeconds int    `yaml:"retry_timeout_seconds"`
 	AuthKey             string `yaml:"auth_key"`
+	Debug               bool   `yaml:"debug"`
 }
 
 type SenderConfig struct {
-	CycleDurationSeconds int `yaml:"cycle_duration_seconds"`
+	IterDurationSeconds int `yaml:"iter_duration_seconds"`
+	IterBufferSize      int `yaml:"iter_buffer_size"`
 }
 
 func LoadConfig(log *logger.Logger, shutdowner fx.Shutdowner) *Config {
@@ -46,7 +62,10 @@ func LoadConfig(log *logger.Logger, shutdowner fx.Shutdowner) *Config {
 	return &Config{
 		Port: viper.GetString("port"),
 		DatabaseConfig: DatabaseConfig{
-			URL: viper.GetString("database.url"),
+			PostgresConfig{
+				URL:   viper.GetString("database.postgres.url"),
+				Debug: viper.GetBool("database.postgres.debug"),
+			},
 		},
 		WebhookProviderConfig: WebhookProviderConfig{
 			BaseURL:             viper.GetString("providers.webhook.base_url"),
@@ -54,9 +73,16 @@ func LoadConfig(log *logger.Logger, shutdowner fx.Shutdowner) *Config {
 			RetriesCount:        viper.GetInt("providers.webhook.retries_count"),
 			RetryTimeoutSeconds: viper.GetInt("providers.webhook.retry_timeout_seconds"),
 			AuthKey:             viper.GetString("providers.webhook.auth_key"),
+			Debug:               viper.GetBool("providers.webhook.debug"),
 		},
 		SenderConfig: SenderConfig{
-			CycleDurationSeconds: viper.GetInt("sender.cycle_duration_seconds"),
+			IterDurationSeconds: viper.GetInt("sender.iter_duration_seconds"),
+			IterBufferSize:      viper.GetInt("sender.iter_buffer_size"),
+		},
+		CacheConfig: CacheConfig{
+			RedisConfig{
+				URL: viper.GetString("cache.redis.url"),
+			},
 		},
 	}
 }

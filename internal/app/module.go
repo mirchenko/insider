@@ -2,6 +2,7 @@ package app
 
 import (
 	"insider/config"
+	"insider/internal/cache"
 	"insider/internal/database"
 	"insider/internal/handler"
 	"insider/internal/http"
@@ -18,6 +19,7 @@ var Module = fx.Options(
 	logger.Module,
 	config.Module,
 	database.Module,
+	cache.Module,
 	repository.Module,
 	services.Module,
 	handler.Module,
